@@ -3,7 +3,7 @@ import mediapipe as mp
 import time
 
 # init cam
-cap = cv2.VideoCapture(1)
+cap = cv2.VideoCapture(0)
 
 cTime = 0
 pTime = 0
@@ -11,7 +11,7 @@ pTime = 0
 # Draw face
 mpDraw = mp.solutions.drawing_utils
 mpFaceMesh = mp.solutions.face_mesh
-faceMesh = mpFaceMesh.FaceMesh(max_num_faces=100000)
+faceMesh = mpFaceMesh.FaceMesh(max_num_faces=2)
 drawSpec = mpDraw.DrawingSpec(thickness=1, circle_radius=2)
 
 while True:
@@ -20,6 +20,13 @@ while True:
     results = faceMesh.process(imgRGB)
     if results.multi_face_landmarks:
         for faceLms in results.multi_face_landmarks:
+            for lm in faceLms.landmark:
+                z = int(lm.z * 1000)
+                # print(z)
+                if z < -6 or z > 20:
+                    drawSpec = mpDraw.DrawingSpec(color=(0, 0, 255))
+                else:
+                    drawSpec = mpDraw.DrawingSpec(color=(0, 255, 0))
             mpDraw.draw_landmarks(img, faceLms, mpFaceMesh.FACE_CONNECTIONS, drawSpec, drawSpec)
 
 
